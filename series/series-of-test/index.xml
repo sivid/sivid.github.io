@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Series Of Test on my (new) blog</title>
+    <link>https://sivid.github.io/series/series-of-test/</link>
+    <description>Recent content in Series Of Test on my (new) blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 01 Aug 2016 23:28:32 +0800</lastBuildDate>
+    <atom:link href="https://sivid.github.io/series/series-of-test/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>gg</title>
+      <link>https://sivid.github.io/post/gg/</link>
+      <pubDate>Mon, 01 Aug 2016 23:28:32 +0800</pubDate>
+      
+      <guid>https://sivid.github.io/post/gg/</guid>
+      <description>&lt;p&gt;###first page!&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;#excited&lt;/code&gt; &lt;code&gt;#ok&lt;/code&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
