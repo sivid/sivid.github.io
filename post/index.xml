@@ -6,15 +6,38 @@
     <description>Recent content in Posts on my (new) blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 01 Aug 2016 23:28:32 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 04 Aug 2016 22:02:37 +0800</lastBuildDate>
     <atom:link href="https://sivid.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>gg</title>
-      <link>https://sivid.github.io/post/gg/</link>
+      <title>Vertx async methods</title>
+      <link>https://sivid.github.io/post/Vertx-async-methods/</link>
+      <pubDate>Thu, 04 Aug 2016 22:02:37 +0800</pubDate>
+      
+      <guid>https://sivid.github.io/post/Vertx-async-methods/</guid>
+      <description>&lt;p&gt;I&amp;rsquo;ve been using &lt;a href=&#34;http://vertx.io&#34;&gt;Vertx&lt;/a&gt; for a while now, and so far it hasn&amp;rsquo;t disappointed me.  There&amp;rsquo;s one thing though, because Vertx came out before Java 8, it doesn&amp;rsquo;t use &lt;code&gt;java.util.concurrent.CompletableFuture&lt;/code&gt;.  Instead, it rolls its own future/promise implementation called &lt;code&gt;io.vertx.core.Future&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;There was a &lt;a href=&#34;https://groups.google.com/forum/?fromgroups#!topic/vertx/KbaXI1ULGYY&#34;&gt;thread&lt;/a&gt; on the Vertx discussion group a few days ago, I wrote about what I knew.  Here&amp;rsquo;s a copy.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;I&amp;rsquo;ve noticed that &lt;code&gt;CompletableFuture&lt;/code&gt; sometimes assigns my HttpClient instance to run on another thread, which leads to a Vertx warning.  It&amp;rsquo;s &amp;ldquo;fixable&amp;rdquo; by wrapping a HttpClient call with a &lt;code&gt;vertx.runOnContext()&lt;/code&gt;, but I &lt;em&gt;guess&lt;/em&gt; the more idiomatic way would be to avoid using &lt;code&gt;CompletableFuture&lt;/code&gt;, as it&amp;rsquo;s a different thread handling implementation to the one in Vertx.&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;CompletableFuture&lt;/code&gt;, according to Java documents, uses JVM&amp;rsquo;s default fork/join pool.  Although one interesting thing I&amp;rsquo;ve observed is that HttpClient calls chained with &lt;code&gt;CompletableFuture&lt;/code&gt; tends to run on Vertx&amp;rsquo;s own threads as well (with thread names like vert.x-eventloop-thread-X).  This is confusing, to me at least, maybe someone in the know could chime in?&lt;/p&gt;
+
+&lt;p&gt;To stay on topic, the default &lt;code&gt;io.vertx.core.Future&lt;/code&gt; already has support for a &lt;code&gt;.all&lt;/code&gt; operation, see &lt;a href=&#34;http://vertx.io/docs/vertx-core/java/#_async_coordination&#34;&gt;http://vertx.io/docs/vertx-core/java/#_async_coordination&lt;/a&gt;.
+If that&amp;rsquo;s not enough for your use case, I&amp;rsquo;ve been using this implementation &lt;a href=&#34;https://github.com/jtruelove/vertx-util&#34;&gt;https://github.com/jtruelove/vertx-util&lt;/a&gt; with no problems.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;There&amp;rsquo;s too much code that depend on &lt;code&gt;CompletableFuture&lt;/code&gt; in my company&amp;rsquo;s backend server now, going back to change them to use&lt;code&gt;io.vertx.core.Future&lt;/code&gt; is a time-consuming venture that may not even make a difference.  I will be using vertx-util to chain my futures from now on though.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>first</title>
+      <link>https://sivid.github.io/post/first/</link>
       <pubDate>Mon, 01 Aug 2016 23:28:32 +0800</pubDate>
       
-      <guid>https://sivid.github.io/post/gg/</guid>
+      <guid>https://sivid.github.io/post/first/</guid>
       <description>
 
 &lt;h3 id=&#34;first-page&#34;&gt;first page!&lt;/h3&gt;

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="generator" content="Hugo 0.16" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <link rel='stylesheet' href='//fonts.googleapis.com/css?family=Open+Sans|Marcellus+SC'>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/solarized_dark.min.css">
+    <link rel="stylesheet" href="https://sivid.github.io/css/styles.css">
+    <link rel="stylesheet" href="https://sivid.github.io/css/custom.css">
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="https://sivid.github.io//index.xml">
+
+    
+    <title>Vertx async methods - my (new) blog</title>
+    <meta property='og:title' content="Vertx async methods - my (new) blog">
+    <meta property="og:type" content="article">
+    
+
+    <meta property="og:url" content="https://sivid.github.io/post/Vertx-async-methods/">
+    
+    
+
+  </head>
+
+  <body>
+
+    <header class="site">
+      <nav class="navbar navbar-default">
+        <div class="container">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="https://sivid.github.io/">my (new) blog</a>
+          </div>
+
+          <div id="navbar" class="collapse navbar-collapse">
+            
+          </div>
+
+        </div>
+      </nav>
+    </header>
+
+    <div class="site">
+      <div class="container">
+
+
+
+<div class="single">
+
+  <div class="row">
+    <div class="col-md-8">
+
+      <article class="single" itemscope="itemscope" itemtype="http://schema.org/Article">
+
+        <meta itemprop="mainEntityOfPage"  itemType="https://schema.org/WebPage" content="https://sivid.github.io/"/>
+        <meta itemprop="dateModified" content="2016-08-04T22:02:37&#43;08:00">
+        <meta itemprop="headline" content="Vertx async methods">
+        <meta itemprop="description" content="I&rsquo;ve been using Vertx for a while now, and so far it hasn&rsquo;t disappointed me. There&rsquo;s one thing though, because Vertx came out before Java 8, it doesn&rsquo;t use java.util.concurrent.CompletableFuture. Instead, it rolls its own future/promise implementation called io.vertx.core.Future. There was a thread on the Vertx discussion group a few days ago, I wrote about what I knew. Here&rsquo;s a copy. I&rsquo;ve noticed that CompletableFuture sometimes assigns my HttpClient instance to run on another thread, which leads to a Vertx warning.">
+        <meta itemprop="url" content="https://sivid.github.io/post/Vertx-async-methods/">
+        <div itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
+          <meta itemprop="url" content="https://sivid.github.io/images/default.jpg" />
+          <meta itemprop="width" content="800">
+          <meta itemprop="height" content="800">
+        </div>
+        <div itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+          <div itemprop="logo" itemscope itemtype="https://schema.org/ImageObject">
+            <meta itemprop="url" content="https://sivid.github.io/images/logo.jpg">
+            <meta itemprop="width" content="100">
+            <meta itemprop="height" content="100">
+          </div>
+          <meta itemprop="name" content="my (new) blog">
+        </div>
+        <div itemprop="author" itemscope itemtype="https://schema.org/Person">
+          <meta itemprop="name" content="sivid">
+        </div>
+
+        <header class="article-header">
+          <time itemprop="datePublished" pubdate="pubdate" datetime="2016-08-04T22:02:37&#43;08:00">Thu, Aug 4, 2016</time>
+          <h1 class="article-title">Vertx async methods</h1>
+        </header>
+
+        <div class="article-body" itemprop="articleBody">
+          <p>I&rsquo;ve been using <a href="http://vertx.io">Vertx</a> for a while now, and so far it hasn&rsquo;t disappointed me.  There&rsquo;s one thing though, because Vertx came out before Java 8, it doesn&rsquo;t use <code>java.util.concurrent.CompletableFuture</code>.  Instead, it rolls its own future/promise implementation called <code>io.vertx.core.Future</code>.</p>
+
+<p>There was a <a href="https://groups.google.com/forum/?fromgroups#!topic/vertx/KbaXI1ULGYY">thread</a> on the Vertx discussion group a few days ago, I wrote about what I knew.  Here&rsquo;s a copy.</p>
+
+<blockquote>
+<p>I&rsquo;ve noticed that <code>CompletableFuture</code> sometimes assigns my HttpClient instance to run on another thread, which leads to a Vertx warning.  It&rsquo;s &ldquo;fixable&rdquo; by wrapping a HttpClient call with a <code>vertx.runOnContext()</code>, but I <em>guess</em> the more idiomatic way would be to avoid using <code>CompletableFuture</code>, as it&rsquo;s a different thread handling implementation to the one in Vertx.</p>
+
+<p><code>CompletableFuture</code>, according to Java documents, uses JVM&rsquo;s default fork/join pool.  Although one interesting thing I&rsquo;ve observed is that HttpClient calls chained with <code>CompletableFuture</code> tends to run on Vertx&rsquo;s own threads as well (with thread names like vert.x-eventloop-thread-X).  This is confusing, to me at least, maybe someone in the know could chime in?</p>
+
+<p>To stay on topic, the default <code>io.vertx.core.Future</code> already has support for a <code>.all</code> operation, see <a href="http://vertx.io/docs/vertx-core/java/#_async_coordination">http://vertx.io/docs/vertx-core/java/#_async_coordination</a>.
+If that&rsquo;s not enough for your use case, I&rsquo;ve been using this implementation <a href="https://github.com/jtruelove/vertx-util">https://github.com/jtruelove/vertx-util</a> with no problems.</p>
+</blockquote>
+
+<p>There&rsquo;s too much code that depend on <code>CompletableFuture</code> in my company&rsquo;s backend server now, going back to change them to use<code>io.vertx.core.Future</code> is a time-consuming venture that may not even make a difference.  I will be using vertx-util to chain my futures from now on though.</p>
+
+        </div>
+
+
+        <aside>
+          <div class="section"><a href="https://sivid.github.io/tags/vertx" class="tag">vertx</a> <a href="https://sivid.github.io/tags/java" class="tag">java</a> <a href="https://sivid.github.io/tags/async" class="tag">async</a> </div>
+
+          
+
+          
+          
+          
+        </aside>
+
+      </article>
+
+    </div>
+    <div class="col-md-4">
+      
+<aside class="site">
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">LatestPosts</h2>
+    </div>
+    <div class="list-group">
+      
+      <a href="https://sivid.github.io/post/Vertx-async-methods/" class="list-group-item">Vertx async methods</a>
+      
+      <a href="https://sivid.github.io/post/first/" class="list-group-item">first</a>
+      
+    </div>
+  </div>
+
+  
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">category</h2>
+    </div>
+    <div class="list-group">
+      
+    </div>
+  </div>
+  
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">series</h2>
+    </div>
+    <div class="list-group">
+      
+    </div>
+  </div>
+  
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">tag</h2>
+    </div>
+    <div class="list-group">
+      
+      <a href="https://sivid.github.io/tags/async" class="list-group-item">async</a>
+      
+      <a href="https://sivid.github.io/tags/java" class="list-group-item">java</a>
+      
+      <a href="https://sivid.github.io/tags/vertx" class="list-group-item">vertx</a>
+      
+    </div>
+  </div>
+  
+
+</aside>
+
+
+    </div>
+  </div>
+
+</div>
+
+      </div>
+    </div>
+
+    <footer class="site">
+      <div class="container">
+        <p>&copy; 2016 sivid</p>
+        <p>Powered by <a href="http://gohugo.io" target="_blank" rel="nofollow">Hugo</a>, Theme <a href="https://github.com/dim0627/hugo_theme_beg" target="_blank" rel="nofollow">beg</a> designed by <a href="http://yet.unresolved.xyz" target="_blank" rel="nofollow">Daisuke Tsuji</a></p>
+      </div>
+    </footer>
+
+    <script src="//code.jquery.com/jquery-2.2.1.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-81820759-1', 'auto');
+    ga('send', 'pageview');
+    </script>
+    
+    
+
+  </body>
+</html>
+
